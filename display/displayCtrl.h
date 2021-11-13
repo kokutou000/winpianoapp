@@ -21,6 +21,7 @@ namespace display
 
     private:
         void InitializeRectMap();
+        void InitializeKeyMap();
 
     private:
         HWND windowInfo;
@@ -28,6 +29,7 @@ namespace display
         int wWin;
         int hWin;
 
-        std::map<int, RECT> keyRectMap;   // 鍵盤表示座標マップ<キー, 座標情報>
+        std::map<int, int> keyKeyMap;   // キーボードvs鍵盤マップ<キー, 鍵盤番号>
+        std::map<int, RECT> keyRectMap;   // 鍵盤表示座標マップ<鍵盤番号, 座標情報>
     };
 } // namespace display
