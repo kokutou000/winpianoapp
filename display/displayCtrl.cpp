@@ -13,6 +13,7 @@ displayCtrl::displayCtrl()
     windowInfo = nullptr;
     wWin = 0;
     hWin = 0;
+    InitializeRectMap();
 }
 
 //---------------------------------------------------------------
