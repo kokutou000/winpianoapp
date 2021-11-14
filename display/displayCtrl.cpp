@@ -10,9 +10,9 @@ namespace display
 displayCtrl::displayCtrl()
 {
     std::cout << "constructor displayCtrl" << std::endl;
-    windowInfo = nullptr;
-    wWin = 0;
-    hWin = 0;
+    windowInfo_ = nullptr;
+    wWin_ = 0;
+    hWin_ = 0;
     InitializeKeyMap();
     InitializeRectMap();
 }
@@ -29,7 +29,7 @@ displayCtrl::~displayCtrl()
 void displayCtrl::SetHWinInfo(HWND hw)
 {
     std::cout << "set wininfo" << std::endl;
-    windowInfo = hw;
+    windowInfo_ = hw;
 }
 
 //---------------------------------------------------------------
@@ -39,22 +39,51 @@ void displayCtrl::UpdateWindowInfo()
     std::cout << "called draw window" << std::endl;
     // ウィンドウジオメトリ情報を取得
     RECT rect;
-    if(GetWindowRect(windowInfo, &rect))
+    if(GetWindowRect(windowInfo_, &rect))
     {
         std::cout << "set geo" << std::endl;
         if(&rect != nullptr)
         {
-            wWin = rect.right - rect.left;
-            hWin = rect.bottom - rect.top;
-            std::cout << "check w,h:" << wWin << "," << hWin << std::endl;
+            wWin_ = rect.right - rect.left;
+            hWin_ = rect.bottom - rect.top;
+            std::cout << "check w,h:" << wWin_ << "," << hWin_ << std::endl;
         }
     }
 
     std::cout << "draw window0" << std::endl;
-    if(windowInfo == nullptr) return;
-    if(wWin == 0) return;
-    if(hWin == 0) return;
+    if(windowInfo_ == nullptr) return;
+    if(wWin_ == 0) return;
+    if(hWin_ == 0) return;
 
+    int imax = 28;
+    // 今の画面サイズを元に各キーに対応する鍵盤の座標を計算
+    for(int i = 0; i < imax; ++i)
+    {
+        // 白鍵
+        int xwl = i * wWin_ / imax;
+        int xwr = (i + 1) * wWin_ / imax;
+        int ywt = 0;
+        int ywb = hWin_;
+        RECT rWhite = {xwl, ywt, xwr, ywb};
+
+        // 黒鍵
+        int xbl = i * wWin_ / imax + wWin_ * 0.7 / imax;
+        int xbr = (i + 1) * wWin_ / imax + wWin_ * 0.3 / imax;
+        int ybt = 0;
+        int ybb = hWin_ * 6.0 / 10.0;
+        RECT rBlack = {xbl, ybt, xbr, ybb};
+
+        keyRectMap[2*i]   = rWhite;
+        keyRectMap[2*i+1] = rBlack;
+    }
+
+    DrawWindow();
+}
+
+//---------------------------------------------------------------
+// ウィンドウ描画更新
+void displayCtrl::DrawWindow()
+{
     std::cout << "draw window1" << std::endl;
     HDC hdc;
     PAINTSTRUCT ps;
@@ -62,38 +91,35 @@ void displayCtrl::UpdateWindowInfo()
     HBRUSH hbrushB;
 
     // ピアノベース画面を描画
-    hdc = BeginPaint(windowInfo, &ps);
+    hdc = BeginPaint(windowInfo_, &ps);
     hpen = CreatePen(PS_SOLID, 1, 0);
     SelectObject(hdc, hpen);
     // ベース鍵盤
+    int imax2 = 56;
     int imax = 28;
-    for(int i = 0; i < imax; ++i)
+    for(int i = 0; i < imax2; i = i+2)
     {
         // 白鍵
-        int xl = i * wWin / imax;
-        int xr = (i + 1) * wWin / imax;
-        int yt = 0;
-        int yb = hWin;
-        Rectangle(hdc, xl, yt, xr, yb);
+        RECT rw = keyRectMap[i];
+        Rectangle(hdc, rw.left, rw.top, rw.right, rw.bottom);
     }
     hpenB = CreatePen(PS_SOLID, 1, 0);
     SelectObject(hdc, hpenB);
     hbrushB = CreateSolidBrush(RGB(0,0,0));
     SelectObject(hdc, hbrushB);
-    for(int i = 0; i < imax; ++i)
+    for(int i = 1; i < imax2; i = i+2)
     {
-        if(i % 7 == 2) continue;
-        if(i % 7 == 6) continue;
+        // スキップ対象
+        if((i-1)/2 % 7 == 2) continue;
+        if((i-1)/2 % 7 == 6) continue;
         // 黒鍵
-        int xlb = i * wWin / imax + wWin * 0.7 / imax;
-        int xrb = (i + 1) * wWin / imax + wWin * 0.3 / imax;
-        int ytb = 0;
-        int ybb = hWin * 6.0 / 10.0;
-        Rectangle(hdc, xlb, ytb, xrb, ybb);
+        RECT rb = keyRectMap[i];
+        Rectangle(hdc, rb.left, rb.top, rb.right, rb.bottom);
     }
-    EndPaint(windowInfo, &ps);
+    EndPaint(windowInfo_, &ps);
     DeleteObject(hpen);
     DeleteObject(hpenB);
+    DeleteObject(hbrushB);
 }
 
 //---------------------------------------------------------------
@@ -101,11 +127,12 @@ void displayCtrl::UpdateWindowInfo()
 void displayCtrl::InitializeRectMap()
 {
     keyRectMap.clear();
-    int cnt = keyKeyMap.size();
-    for(int i = 1; i < cnt + 1; ++i)
+    int keykeysize = keyKeyMap.size();
+    int imax2 = 56;
+    for(int i = 0; i < imax2; ++i)
     {
         RECT tmp = {0,0,0,0};
-        keyRectMap.insert(std::make_pair(i,tmp));
+        keyRectMap.insert(std::make_pair(i, tmp));
     }
 }
 
@@ -118,39 +145,39 @@ void displayCtrl::InitializeKeyMap()
     keyKeyMap.insert(std::make_pair(0x58, 2)); // x, 
     keyKeyMap.insert(std::make_pair(0x43, 3)); // c, 
     keyKeyMap.insert(std::make_pair(0x56, 4)); // v, 
-    keyKeyMap.insert(std::make_pair(0x42, 5)); // b, 
-    keyKeyMap.insert(std::make_pair(0x4E, 6)); // n, 
-    keyKeyMap.insert(std::make_pair(0x4D, 7)); // m, 
-    keyKeyMap.insert(std::make_pair(0x41, 8)); // a, 
-    keyKeyMap.insert(std::make_pair(0x53, 9)); // s, 
-    keyKeyMap.insert(std::make_pair(0x44, 10)); // d, 
-    keyKeyMap.insert(std::make_pair(0x46, 11)); // f, 
-    keyKeyMap.insert(std::make_pair(0x47, 12)); // g, 
-    keyKeyMap.insert(std::make_pair(0x48, 13)); // h, 
-    keyKeyMap.insert(std::make_pair(0x4A, 14)); // j, 
-    keyKeyMap.insert(std::make_pair(0x4B, 15)); // k, 
-    keyKeyMap.insert(std::make_pair(0x4C, 16)); // l, 
-    keyKeyMap.insert(std::make_pair(0x51, 17)); // q, 
-    keyKeyMap.insert(std::make_pair(0x57, 18)); // w, 
-    keyKeyMap.insert(std::make_pair(0x45, 19)); // e, 
-    keyKeyMap.insert(std::make_pair(0x52, 20)); // r, 
-    keyKeyMap.insert(std::make_pair(0x54, 21)); // t, 
-    keyKeyMap.insert(std::make_pair(0x59, 22)); // y, 
-    keyKeyMap.insert(std::make_pair(0x55, 23)); // u, 
-    keyKeyMap.insert(std::make_pair(0x49, 24)); // i, 
-    keyKeyMap.insert(std::make_pair(0x4F, 25)); // o, 
-    keyKeyMap.insert(std::make_pair(0x50, 26)); // p, 
+    keyKeyMap.insert(std::make_pair(0x42, 6)); // b, 
+    keyKeyMap.insert(std::make_pair(0x4E, 7)); // n, 
+    keyKeyMap.insert(std::make_pair(0x4D, 8)); // m, 
+    keyKeyMap.insert(std::make_pair(0x41, 9)); // a, 
+    keyKeyMap.insert(std::make_pair(0x53, 10)); // s, 
+    keyKeyMap.insert(std::make_pair(0x44, 11)); // d, 
+    keyKeyMap.insert(std::make_pair(0x46, 12)); // f, 
+    keyKeyMap.insert(std::make_pair(0x47, 14)); // g, 
+    keyKeyMap.insert(std::make_pair(0x48, 15)); // h, 
+    keyKeyMap.insert(std::make_pair(0x4A, 16)); // j, 
+    keyKeyMap.insert(std::make_pair(0x4B, 17)); // k, 
+    keyKeyMap.insert(std::make_pair(0x4C, 18)); // l, 
+    keyKeyMap.insert(std::make_pair(0x51, 20)); // q, 
+    keyKeyMap.insert(std::make_pair(0x57, 21)); // w, 
+    keyKeyMap.insert(std::make_pair(0x45, 22)); // e, 
+    keyKeyMap.insert(std::make_pair(0x52, 23)); // r, 
+    keyKeyMap.insert(std::make_pair(0x54, 24)); // t, 
+    keyKeyMap.insert(std::make_pair(0x59, 25)); // y, 
+    keyKeyMap.insert(std::make_pair(0x55, 26)); // u, 
+    keyKeyMap.insert(std::make_pair(0x49, 28)); // i, 
+    keyKeyMap.insert(std::make_pair(0x4F, 29)); // o, 
+    keyKeyMap.insert(std::make_pair(0x50, 30)); // p, 
 
-    keyKeyMap.insert(std::make_pair(0x31, 27)); // 1, 
-    keyKeyMap.insert(std::make_pair(0x32, 28)); // 2, 
-    keyKeyMap.insert(std::make_pair(0x33, 29)); // 3, 
-    keyKeyMap.insert(std::make_pair(0x34, 30)); // 4, 
-    keyKeyMap.insert(std::make_pair(0x35, 31)); // 5, 
-    keyKeyMap.insert(std::make_pair(0x36, 32)); // 6, 
-    keyKeyMap.insert(std::make_pair(0x37, 33)); // 7, 
-    keyKeyMap.insert(std::make_pair(0x38, 34)); // 8, 
-    keyKeyMap.insert(std::make_pair(0x39, 35)); // 9, 
-    keyKeyMap.insert(std::make_pair(0x30, 36)); // 0, 
+    keyKeyMap.insert(std::make_pair(0x31, 31)); // 1, 
+    keyKeyMap.insert(std::make_pair(0x32, 32)); // 2, 
+    keyKeyMap.insert(std::make_pair(0x33, 34)); // 3, 
+    keyKeyMap.insert(std::make_pair(0x34, 35)); // 4, 
+    keyKeyMap.insert(std::make_pair(0x35, 36)); // 5, 
+    keyKeyMap.insert(std::make_pair(0x36, 37)); // 6, 
+    keyKeyMap.insert(std::make_pair(0x37, 38)); // 7, 
+    keyKeyMap.insert(std::make_pair(0x38, 39)); // 8, 
+    keyKeyMap.insert(std::make_pair(0x39, 40)); // 9, 
+    keyKeyMap.insert(std::make_pair(0x30, 42)); // 0, 
 }
 
 } // namespace display
