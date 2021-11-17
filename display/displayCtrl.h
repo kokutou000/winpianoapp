@@ -3,6 +3,7 @@
 ************************************************************/
 #include <windows.h>
 #include <map>
+#include <list>
 
 namespace display
 {
@@ -20,6 +21,8 @@ namespace display
         void UpdateWindowInfo();
 
         void DrawWindow();
+
+        void SetKeyInfo(std::list<int>);
 
     private:
         void InitializeRectMap();

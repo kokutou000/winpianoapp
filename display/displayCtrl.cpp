@@ -2,6 +2,10 @@
 
 #include <iostream>
 
+static constexpr int PIANOKEYBOARDNUMALL  = 56;
+static constexpr int PIANOKEYBOARDNUMHALF = 28;
+static constexpr int PIANOOCTAVENO = 8;
+
 namespace display
 {
 
@@ -55,20 +59,19 @@ void displayCtrl::UpdateWindowInfo()
     if(wWin_ == 0) return;
     if(hWin_ == 0) return;
 
-    int imax = 28;
     // 今の画面サイズを元に各キーに対応する鍵盤の座標を計算
-    for(int i = 0; i < imax; ++i)
+    for(int i = 0; i < PIANOKEYBOARDNUMHALF; ++i)
     {
         // 白鍵
-        int xwl = i * wWin_ / imax;
-        int xwr = (i + 1) * wWin_ / imax;
+        int xwl = i * wWin_ / PIANOKEYBOARDNUMHALF;
+        int xwr = (i + 1) * wWin_ / PIANOKEYBOARDNUMHALF;
         int ywt = 0;
         int ywb = hWin_;
         RECT rWhite = {xwl, ywt, xwr, ywb};
 
         // 黒鍵
-        int xbl = i * wWin_ / imax + wWin_ * 0.7 / imax;
-        int xbr = (i + 1) * wWin_ / imax + wWin_ * 0.3 / imax;
+        int xbl = i * wWin_ / PIANOKEYBOARDNUMHALF + wWin_ * 0.7 / PIANOKEYBOARDNUMHALF;
+        int xbr = (i + 1) * wWin_ / PIANOKEYBOARDNUMHALF + wWin_ * 0.3 / PIANOKEYBOARDNUMHALF;
         int ybt = 0;
         int ybb = hWin_ * 6.0 / 10.0;
         RECT rBlack = {xbl, ybt, xbr, ybb};
@@ -87,39 +90,47 @@ void displayCtrl::DrawWindow()
     std::cout << "draw window1" << std::endl;
     HDC hdc;
     PAINTSTRUCT ps;
-    HPEN hpen, hpenB;
+    HPEN hpen;
     HBRUSH hbrushB;
 
     // ピアノベース画面を描画
     hdc = BeginPaint(windowInfo_, &ps);
     hpen = CreatePen(PS_SOLID, 1, 0);
+    hbrushB = CreateSolidBrush(RGB(0,0,0));
+
     SelectObject(hdc, hpen);
+
     // ベース鍵盤
-    int imax2 = 56;
-    int imax = 28;
-    for(int i = 0; i < imax2; i = i+2)
+    for(int i = 0; i < PIANOKEYBOARDNUMALL; i = i+2)
     {
         // 白鍵
         RECT rw = keyRectMap[i];
         Rectangle(hdc, rw.left, rw.top, rw.right, rw.bottom);
     }
-    hpenB = CreatePen(PS_SOLID, 1, 0);
-    SelectObject(hdc, hpenB);
-    hbrushB = CreateSolidBrush(RGB(0,0,0));
+    
     SelectObject(hdc, hbrushB);
-    for(int i = 1; i < imax2; i = i+2)
+
+    for(int i = 1; i < PIANOKEYBOARDNUMALL; i = i+2)
     {
         // スキップ対象
-        if((i-1)/2 % 7 == 2) continue;
-        if((i-1)/2 % 7 == 6) continue;
+        if((i-1)/2 % (PIANOOCTAVENO-1) == 2) continue;
+        if((i-1)/2 % (PIANOOCTAVENO-1) == 6) continue;
         // 黒鍵
         RECT rb = keyRectMap[i];
         Rectangle(hdc, rb.left, rb.top, rb.right, rb.bottom);
     }
+    
     EndPaint(windowInfo_, &ps);
+    
     DeleteObject(hpen);
-    DeleteObject(hpenB);
     DeleteObject(hbrushB);
+}
+
+//---------------------------------------------------------------
+// キー押下情報設定
+void displayCtrl::SetKeyInfo(std::list<int> pressKeyList)
+{
+    // TODO:押下したキーに応じた画面上の鍵盤の色を書き直し？
 }
 
 //---------------------------------------------------------------
@@ -128,8 +139,7 @@ void displayCtrl::InitializeRectMap()
 {
     keyRectMap.clear();
     int keykeysize = keyKeyMap.size();
-    int imax2 = 56;
-    for(int i = 0; i < imax2; ++i)
+    for(int i = 0; i < PIANOKEYBOARDNUMALL; ++i)
     {
         RECT tmp = {0,0,0,0};
         keyRectMap.insert(std::make_pair(i, tmp));
