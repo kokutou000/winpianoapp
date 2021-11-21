@@ -17,6 +17,8 @@ displayCtrl::displayCtrl()
     windowInfo_ = nullptr;
     wWin_ = 0;
     hWin_ = 0;
+    flagUpdate_ = true;
+    pianoKeyOnList.clear();
     InitializeKeyMap();
     InitializeRectMap();
 }
@@ -40,7 +42,7 @@ void displayCtrl::SetHWinInfo(HWND hw)
 // ウィンドウ情報設定
 void displayCtrl::UpdateWindowInfo()
 {
-    std::cout << "called draw window" << std::endl;
+    std::cout << "called UpdateWindowInfo" << std::endl;
     // ウィンドウジオメトリ情報を取得
     RECT rect;
     if(GetWindowRect(windowInfo_, &rect))
@@ -54,7 +56,7 @@ void displayCtrl::UpdateWindowInfo()
         }
     }
 
-    std::cout << "draw window0" << std::endl;
+    std::cout << "UpdateWindowInfo" << std::endl;
     if(windowInfo_ == nullptr) return;
     if(wWin_ == 0) return;
     if(hWin_ == 0) return;
@@ -91,12 +93,13 @@ void displayCtrl::DrawWindow()
     HDC hdc;
     PAINTSTRUCT ps;
     HPEN hpen;
-    HBRUSH hbrushB;
+    HBRUSH hbrushB, hbrushY;
 
-    // ピアノベース画面を描画
+    // ピアノ鍵盤画面を描画
     hdc = BeginPaint(windowInfo_, &ps);
     hpen = CreatePen(PS_SOLID, 1, 0);
     hbrushB = CreateSolidBrush(RGB(0,0,0));
+    hbrushY = CreateSolidBrush(RGB(224,224,0));
 
     SelectObject(hdc, hpen);
 
@@ -109,7 +112,6 @@ void displayCtrl::DrawWindow()
     }
     
     SelectObject(hdc, hbrushB);
-
     for(int i = 1; i < PIANOKEYBOARDNUMALL; i = i+2)
     {
         // スキップ対象
@@ -119,18 +121,60 @@ void displayCtrl::DrawWindow()
         RECT rb = keyRectMap[i];
         Rectangle(hdc, rb.left, rb.top, rb.right, rb.bottom);
     }
+
+    // 押下鍵盤
+    SelectObject(hdc, hbrushY);
+    for(auto key : pianoKeyOnList)
+    {
+        if(key == 0) continue;
+        RECT keyRect = keyRectMap[key];
+        Rectangle(hdc, keyRect.left, keyRect.top, keyRect.right, keyRect.bottom);
+    }
     
     EndPaint(windowInfo_, &ps);
     
     DeleteObject(hpen);
     DeleteObject(hbrushB);
+    DeleteObject(hbrushY);
 }
 
 //---------------------------------------------------------------
 // キー押下情報設定
 void displayCtrl::SetKeyInfo(std::list<int> pressKeyList)
 {
-    // TODO:押下したキーに応じた画面上の鍵盤の色を書き直し？
+    std::vector<int> tmp;
+    for(auto keyin : pressKeyList)
+    {
+        int keypiano = keyKeyMap[keyin];
+        if(keypiano == 0) continue;
+        tmp.push_back(keypiano);
+    }
+
+    if(tmp.size() != pianoKeyOnList.size())
+    {
+        flagUpdate_ = true;
+    }
+    else
+    {
+        bool check = false;
+        int tsize = tmp.size();
+        for(int i = 0; i < tsize; ++i)
+        {
+            if(tmp[i] != pianoKeyOnList[i])
+            {
+                check = true;
+                break;
+            }
+        }
+        flagUpdate_ = check;
+    }
+
+    if(flagUpdate_ == true)
+    {
+        pianoKeyOnList = tmp;
+        // 無効リージョンを生成することでWM_PAINTメッセージのポストを呼び出す
+        InvalidateRect(windowInfo_, nullptr, true);
+    }
 }
 
 //---------------------------------------------------------------
@@ -138,7 +182,6 @@ void displayCtrl::SetKeyInfo(std::list<int> pressKeyList)
 void displayCtrl::InitializeRectMap()
 {
     keyRectMap.clear();
-    int keykeysize = keyKeyMap.size();
     for(int i = 0; i < PIANOKEYBOARDNUMALL; ++i)
     {
         RECT tmp = {0,0,0,0};
