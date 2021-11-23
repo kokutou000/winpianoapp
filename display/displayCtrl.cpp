@@ -110,17 +110,6 @@ void displayCtrl::DrawWindow()
         RECT rw = keyRectMap[i];
         Rectangle(hdc, rw.left, rw.top, rw.right, rw.bottom);
     }
-    
-    SelectObject(hdc, hbrushB);
-    for(int i = 1; i < PIANOKEYBOARDNUMALL; i = i+2)
-    {
-        // スキップ対象
-        if((i-1)/2 % (PIANOOCTAVENO-1) == 2) continue;
-        if((i-1)/2 % (PIANOOCTAVENO-1) == 6) continue;
-        // 黒鍵
-        RECT rb = keyRectMap[i];
-        Rectangle(hdc, rb.left, rb.top, rb.right, rb.bottom);
-    }
 
     // 押下鍵盤
     SelectObject(hdc, hbrushY);
@@ -129,6 +118,30 @@ void displayCtrl::DrawWindow()
         if(key == 0) continue;
         RECT keyRect = keyRectMap[key];
         Rectangle(hdc, keyRect.left, keyRect.top, keyRect.right, keyRect.bottom);
+    }
+
+    // 黒鍵盤
+    SelectObject(hdc, hbrushB);
+    for(int i = 1; i < PIANOKEYBOARDNUMALL; i = i+2)
+    {
+        // スキップ対象
+        if((i-1)/2 % (PIANOOCTAVENO-1) == 2) continue;
+        if((i-1)/2 % (PIANOOCTAVENO-1) == 6) continue;
+        // 押下鍵盤に含まれているものはスキップ
+        bool isPressed = false;
+        for(auto keyOn : pianoKeyOnList)
+        {
+            if(keyOn == i)
+            {
+                isPressed = true;
+                break;
+            }
+        }
+        if(isPressed) continue;
+
+        // 黒鍵
+        RECT rb = keyRectMap[i];
+        Rectangle(hdc, rb.left, rb.top, rb.right, rb.bottom);
     }
     
     EndPaint(windowInfo_, &ps);
