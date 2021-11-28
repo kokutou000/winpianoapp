@@ -8,7 +8,6 @@ namespace key
 // コンストラクタ
 keyCtrl::keyCtrl()
 {
-    std::cout << "constructor keyCtrl" << std::endl;
     InitializeKeyStateMap();
 }
 
@@ -17,6 +16,13 @@ keyCtrl::keyCtrl()
 keyCtrl::~keyCtrl()
 {
 
+}
+
+//---------------------------------------------------------------
+// キー情報設定
+void keyCtrl::SetKeyInfo(key::keyInfo* pkinfo)
+{
+    pKeyInfo = pkinfo;
 }
 
 //---------------------------------------------------------------
@@ -70,6 +76,8 @@ std::list<int> keyCtrl::GetListKeyON()
 // キー状態更新
 void keyCtrl::UpdateKeyState(WPARAM wp, bool state)
 {
+    pKeyInfo->SetKeyPressState(state, wp);
+    /*
     try
     {
         keyState.at(wp) = state;
@@ -78,7 +86,7 @@ void keyCtrl::UpdateKeyState(WPARAM wp, bool state)
     {
         std::cerr << e.what() << '\n';
     }
-    
+    */
 }
 
 //---------------------------------------------------------------

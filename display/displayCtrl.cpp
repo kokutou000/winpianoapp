@@ -31,6 +31,13 @@ displayCtrl::~displayCtrl()
 }
 
 //---------------------------------------------------------------
+// キー情報設定
+void displayCtrl::SetKeyInfo(key::keyInfo* pkinfo)
+{
+    pKeyInfo = pkinfo;
+}
+
+//---------------------------------------------------------------
 // ウィンドウ情報設定
 void displayCtrl::SetHWinInfo(HWND hw)
 {
@@ -155,6 +162,20 @@ void displayCtrl::DrawWindow()
 // キー押下情報設定
 void displayCtrl::SetKeyInfo(std::list<int> pressKeyList)
 {
+    // 暫定処置------------------------------------
+    const int maxno = 16;
+    pressKeyList.clear();
+    auto keylist = pKeyInfo->GetKeyInfoPressed();
+    for(auto key : keylist)
+    {
+        if(key.isPressed)
+        {
+            pressKeyList.push_back(key.keyNo);
+            if(pressKeyList.size() >= maxno) break;
+        }
+    }
+    // 暫定処置------------------------------------
+
     std::vector<int> tmp;
     for(auto keyin : pressKeyList)
     {

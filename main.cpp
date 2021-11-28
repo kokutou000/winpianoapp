@@ -4,10 +4,12 @@
 
 #include "display/displayCtrl.h"
 #include "key/keyCtrl.h"
+#include "key/keyInfo.h"
 #include "melody/melodyCtrl.h"
 
 static display::displayCtrl dCtrl = display::displayCtrl();
 static key::keyCtrl         kCtrl = key::keyCtrl();
+static key::keyInfo         kInfo = key::keyInfo();
 static melody::melodyCtrl   mCtrl = melody::melodyCtrl();
 
 /*****************************************************
@@ -78,6 +80,11 @@ int WINAPI WinMain(
     if(hwnd == NULL) return -1;
 
     dCtrl.SetHWinInfo(hwnd);
+
+    dCtrl.SetKeyInfo(&kInfo);
+    kCtrl.SetKeyInfo(&kInfo);
+    mCtrl.SetKeyInfo(&kInfo);
+
 
     // ウィンドウを表示
     //ShowWindow(hwnd, SW_SHOW);

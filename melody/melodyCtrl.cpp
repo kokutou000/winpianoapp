@@ -29,10 +29,31 @@ melodyCtrl::~melodyCtrl()
 }
 
 //---------------------------------------------------------------
+// キー情報設定
+void melodyCtrl::SetKeyInfo(key::keyInfo* pkinfo)
+{
+    pKeyInfo = pkinfo;
+}
+
+//---------------------------------------------------------------
 // キー情報反映
 // [in] keyInfo: 押下キーリスト
 void melodyCtrl::SetKeyInfo(std::list<int> pressKeyList)
 {
+    // 暫定処置------------------------------------
+    const int maxno = 16;
+    pressKeyList.clear();
+    auto keylist = pKeyInfo->GetKeyInfoPressed();
+    for(auto key : keylist)
+    {
+        if(key.isPressed)
+        {
+            pressKeyList.push_back(key.keyNo);
+            if(pressKeyList.size() >= maxno) break;
+        }
+    }
+    // 暫定処置------------------------------------
+
     // チャンネルクリア
     for(auto& ch : channelMap)
     {

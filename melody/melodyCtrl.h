@@ -1,10 +1,16 @@
 /*********************************************************** 
  * 音声操作管理クラス ヘッダファイル
 ************************************************************/
-#include <map>
-#include <list>
+#ifndef _MELODYCTRL
+#define _MELODYCTRL
+
 #include <windows.h>
 #include <mmsystem.h>
+
+#include <map>
+#include <list>
+
+#include "../key/keyInfo.h"
 
 namespace melody
 {
@@ -20,6 +26,8 @@ namespace melody
 
         void SetKeyInfo(std::list<int>);
 
+        void SetKeyInfo(key::keyInfo*);
+
     private:
         void InitializeScaleMap();
         void InitializeChannelMap();
@@ -33,5 +41,9 @@ namespace melody
 
         uint8_t velocity;
 
+        key::keyInfo* pKeyInfo;
+
     };
 } // namespace melody
+
+#endif // _MELODYCTRL

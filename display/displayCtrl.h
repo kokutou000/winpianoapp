@@ -1,10 +1,15 @@
 /*********************************************************** 
  * 描画管理クラス ヘッダファイル
 ************************************************************/
+#ifndef _DISPLAYCTRL
+#define _DISPLAYCTRL
+
 #include <windows.h>
 #include <map>
 #include <list>
 #include <vector>
+
+#include "../key/keyInfo.h"
 
 namespace display
 {
@@ -25,6 +30,8 @@ namespace display
 
         void SetKeyInfo(std::list<int>);
 
+        void SetKeyInfo(key::keyInfo*);
+
     private:
         void InitializeRectMap();
         void InitializeKeyMap();
@@ -39,5 +46,9 @@ namespace display
         std::vector<int> pianoKeyOnList;   // 押下鍵盤リスト
         std::map<int, int> keyKeyMap;   // キーボードvs鍵盤マップ<キー, 鍵盤番号>
         std::map<int, RECT> keyRectMap;   // 鍵盤表示座標マップ<鍵盤番号, 座標情報>
+
+        key::keyInfo* pKeyInfo;
     };
 } // namespace display
+
+#endif // _DISPLAYCTRL
