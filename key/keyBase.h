@@ -14,12 +14,13 @@ namespace key
     ************************************************************/
     typedef struct _keyBaseStruct
     {
-        unsigned short keyNo;   // キーボード番号
-        std::string keyChar;    // キーボード対応名
-        bool isPressed;         // 押下状態
-        int scaleNo;            // 鍵盤番号
-        std::string scaleName;  // ABC音階名
-        RECT scaleDisp;         // 鍵盤座標
+        unsigned short keyValue;    // キーボード対応値
+        std::string keyChar;        // キーボード対応名
+        bool isPressed;             // 押下状態
+        int scaleNo;                // 鍵盤番号（画面における鍵盤位置番号）
+        int scaleValue;             // 音階値（MIDIMSGに渡す音の値）
+        std::string scaleName;      // ABC音階名
+        RECT scaleDisp;             // 鍵盤座標
     } keyBase;
 
 } // namespace key

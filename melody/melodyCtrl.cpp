@@ -46,7 +46,7 @@ void melodyCtrl::Update()
         bool isKeyPressContinue = false;
         for(auto key : keyInfolist)
         {
-            if(key.keyNo == ch.second) isKeyPressContinue = true;
+            if(key.keyValue == ch.second) isKeyPressContinue = true;
         }
         if(isKeyPressContinue) continue;
 
@@ -65,7 +65,7 @@ void melodyCtrl::Update()
         bool isKeyPressed = false;
         for(auto ch : channelMap)
         {
-            if(key.keyNo == ch.second)
+            if(key.keyValue == ch.second)
             {
                 isKeyPressed = true;
                 continue;
@@ -80,9 +80,9 @@ void melodyCtrl::Update()
             if(ch.second == 0)
             {
                 // チャンネル設定
-                ch.second = key.keyNo;
+                ch.second = key.keyValue;
                 // キーに対応する音階値取得
-                int scaleVal = pKeyInfo->GetScaleNo(key.keyNo);
+                int scaleVal = pKeyInfo->GetScaleNo(key.keyValue);
                 // 音生成
                 midiOutShortMsg(hmidiOut, MakeMIDIMsg(0x9, ch.first, scaleVal, velocity));
                 break;

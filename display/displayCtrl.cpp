@@ -19,6 +19,7 @@ displayCtrl::displayCtrl()
     hWin_ = 0;
     flagUpdate_ = true;
     pianoKeyOnList_.clear();
+
     InitializeKeyMap();
     InitializeRectMap();
 }
@@ -63,10 +64,10 @@ void displayCtrl::UpdateWindowInfo()
         }
     }
 
-    std::cout << "UpdateWindowInfo" << std::endl;
     if(windowInfo_ == nullptr) return;
     if(wWin_ == 0) return;
     if(hWin_ == 0) return;
+    std::cout << "UpdateWindowInfo" << std::endl;
 
     // 今の画面サイズを元に各キーに対応する鍵盤の座標を計算
     for(int i = 0; i < PIANOKEYBOARDNUMHALF; ++i)
@@ -168,7 +169,7 @@ void displayCtrl::Update()
     for(auto keyinfo : keyInfoList)
     {
         if(!keyinfo.isPressed) continue;
-        int keypiano = keyKeyMap_[keyinfo.keyNo];
+        int keypiano = keyKeyMap_[keyinfo.keyValue];
         if(keypiano == 0) continue;
         tmp.push_back(keypiano);
     }
