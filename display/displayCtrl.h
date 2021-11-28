@@ -43,11 +43,11 @@ namespace display
         int hWin_;
         bool flagUpdate_;
 
-        std::vector<int> pianoKeyOnList;   // 押下鍵盤リスト
-        std::map<int, int> keyKeyMap;   // キーボードvs鍵盤マップ<キー, 鍵盤番号>
-        std::map<int, RECT> keyRectMap;   // 鍵盤表示座標マップ<鍵盤番号, 座標情報>
+        std::vector<int> pianoKeyOnList_;   // 押下鍵盤リスト
+        std::map<int, int> keyKeyMap_;   // キーボードvs鍵盤マップ<キー, 鍵盤番号>
+        std::map<int, RECT> keyRectMap_;   // 鍵盤表示座標マップ<鍵盤番号, 座標情報>
 
-        key::keyInfo* pKeyInfo;
+        key::keyInfo* pKeyInfo_;
     };
 } // namespace display
 
