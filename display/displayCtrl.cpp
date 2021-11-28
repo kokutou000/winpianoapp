@@ -160,9 +160,10 @@ void displayCtrl::DrawWindow()
 
 //---------------------------------------------------------------
 // キー押下情報設定
-void displayCtrl::SetKeyInfo(std::list<int> pressKeyList)
+void displayCtrl::Update()
 {
     // 暫定処置------------------------------------
+    std::list<int> pressKeyList;
     const int maxno = 16;
     pressKeyList.clear();
     auto keylist = pKeyInfo->GetKeyInfoPressed();

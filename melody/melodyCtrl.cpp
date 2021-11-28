@@ -9,8 +9,6 @@ namespace melody
 // コンストラクタ
 melodyCtrl::melodyCtrl()
 {
-    std::cout << "constructor melodyCtrl" << std::endl;
-    InitializeScaleMap();
     InitializeChannelMap();
 
     velocity = 0x60;
@@ -37,47 +35,37 @@ void melodyCtrl::SetKeyInfo(key::keyInfo* pkinfo)
 
 //---------------------------------------------------------------
 // キー情報反映
-// [in] keyInfo: 押下キーリスト
-void melodyCtrl::SetKeyInfo(std::list<int> pressKeyList)
+void melodyCtrl::Update()
 {
-    // 暫定処置------------------------------------
-    const int maxno = 16;
-    pressKeyList.clear();
-    auto keylist = pKeyInfo->GetKeyInfoPressed();
-    for(auto key : keylist)
-    {
-        if(key.isPressed)
-        {
-            pressKeyList.push_back(key.keyNo);
-            if(pressKeyList.size() >= maxno) break;
-        }
-    }
-    // 暫定処置------------------------------------
+    auto keyInfolist = pKeyInfo->GetKeyInfoPressed();
 
     // チャンネルクリア
     for(auto& ch : channelMap)
     {
         if(ch.second == 0) continue;  // 未使用チャンネルはスキップ
         bool isKeyPressContinue = false;
-        for(auto key : pressKeyList)
+        for(auto key : keyInfolist)
         {
-            if(key == ch.second) isKeyPressContinue = true;
+            if(key.keyNo == ch.second) isKeyPressContinue = true;
         }
         if(isKeyPressContinue) continue;
+
+        // 押下キーに対応する音階値取得
+        int scaleVal = pKeyInfo->GetScaleNo(ch.second);
         
         // 音消去
-        midiOutShortMsg(hmidiOut, MakeMIDIMsg(0x8, ch.first, scaleMap[ch.second], 0));
+        midiOutShortMsg(hmidiOut, MakeMIDIMsg(0x8, ch.first, scaleVal, 0));
         // チャンネルクリア
         ch.second = 0;
     }
 
     // チャンネル設定
-    for(auto key : pressKeyList)
+    for(auto key : keyInfolist)
     {
         bool isKeyPressed = false;
         for(auto ch : channelMap)
         {
-            if(key == ch.second)
+            if(key.keyNo == ch.second)
             {
                 isKeyPressed = true;
                 continue;
@@ -92,14 +80,14 @@ void melodyCtrl::SetKeyInfo(std::list<int> pressKeyList)
             if(ch.second == 0)
             {
                 // チャンネル設定
-                ch.second = key;
+                ch.second = key.keyNo;
+                // キーに対応する音階値取得
+                int scaleVal = pKeyInfo->GetScaleNo(key.keyNo);
                 // 音生成
-                midiOutShortMsg(hmidiOut, MakeMIDIMsg(0x9, ch.first, scaleMap[ch.second], velocity));
+                midiOutShortMsg(hmidiOut, MakeMIDIMsg(0x9, ch.first, scaleVal, velocity));
                 break;
             }
         }
-
-        //std::cout << "check setkeyinfo:" << key << std::endl;
     }
 }
 
@@ -112,9 +100,8 @@ void melodyCtrl::SetKeyInfo(std::list<int> pressKeyList)
 unsigned long melodyCtrl::MakeMIDIMsg(uint8_t st, uint8_t ch, uint8_t d1, uint8_t d2)
 {
     unsigned long msg = 0;
-    //msg = (DWORD)((st<<4) | ch | (d1<<8) | (d2<<16));
     msg = (DWORD)((st<<4) | ch | (d1<<8) | (d2<<16));
-    std::cout << "make msg:" << msg << " based st:" << (int)st << ", ch:" << (int)ch << ", d1:" << (int)d1 << ", d2:" << (int)d2 << std::endl; 
+    //std::cout << "make msg:" << msg << " based st:" << (int)st << ", ch:" << (int)ch << ", d1:" << (int)d1 << ", d2:" << (int)d2 << std::endl; 
     return msg;
 }
 
@@ -141,50 +128,6 @@ void melodyCtrl::InitializeChannelMap()
     channelMap.insert(std::make_pair(13, 0));
     channelMap.insert(std::make_pair(14, 0));
     channelMap.insert(std::make_pair(15, 0));
-}
-
-//---------------------------------------------------------------
-// 音階マップ初期化
-void melodyCtrl::InitializeScaleMap()
-{
-    scaleMap.clear();
-    scaleMap.insert(std::make_pair(0x5A, 0x31)); // z, ド＃
-    scaleMap.insert(std::make_pair(0x58, 0x32)); // x, レ
-    scaleMap.insert(std::make_pair(0x43, 0x33)); // c, レ＃
-    scaleMap.insert(std::make_pair(0x56, 0x34)); // v, ミ
-    scaleMap.insert(std::make_pair(0x42, 0x35)); // b, ファ
-    scaleMap.insert(std::make_pair(0x4E, 0x36)); // n, ファ＃
-    scaleMap.insert(std::make_pair(0x4D, 0x37)); // m, ソ
-    scaleMap.insert(std::make_pair(0x41, 0x38)); // a, ソ＃
-    scaleMap.insert(std::make_pair(0x53, 0x39)); // s, ラ
-    scaleMap.insert(std::make_pair(0x44, 0x3A)); // d, ラ＃
-    scaleMap.insert(std::make_pair(0x46, 0x3B)); // f, シ
-    scaleMap.insert(std::make_pair(0x47, 0x3C)); // g, ド
-    scaleMap.insert(std::make_pair(0x48, 0x3D)); // h, ド＃
-    scaleMap.insert(std::make_pair(0x4A, 0x3E)); // j, レ
-    scaleMap.insert(std::make_pair(0x4B, 0x3F)); // k, レ#
-    scaleMap.insert(std::make_pair(0x4C, 0x40)); // l, ミ
-    scaleMap.insert(std::make_pair(0x51, 0x41)); // q, ファ
-    scaleMap.insert(std::make_pair(0x57, 0x42)); // w, ファ＃
-    scaleMap.insert(std::make_pair(0x45, 0x43)); // e, ソ
-    scaleMap.insert(std::make_pair(0x52, 0x44)); // r, ソ＃
-    scaleMap.insert(std::make_pair(0x54, 0x45)); // t, ラ
-    scaleMap.insert(std::make_pair(0x59, 0x46)); // y, ラ＃
-    scaleMap.insert(std::make_pair(0x55, 0x47)); // u, シ
-    scaleMap.insert(std::make_pair(0x49, 0x48)); // i, ド
-    scaleMap.insert(std::make_pair(0x4F, 0x49)); // o, ド＃
-    scaleMap.insert(std::make_pair(0x50, 0x4A)); // p, レ
-
-    scaleMap.insert(std::make_pair(0x31, 0x4B)); // 1, レ＃
-    scaleMap.insert(std::make_pair(0x32, 0x4C)); // 2, ミ
-    scaleMap.insert(std::make_pair(0x33, 0x4D)); // 3, ファ
-    scaleMap.insert(std::make_pair(0x34, 0x4E)); // 4, ファ＃
-    scaleMap.insert(std::make_pair(0x35, 0x4F)); // 5, ソ
-    scaleMap.insert(std::make_pair(0x36, 0x50)); // 6, ソ＃
-    scaleMap.insert(std::make_pair(0x37, 0x51)); // 7, ラ
-    scaleMap.insert(std::make_pair(0x38, 0x52)); // 8, ラ＃
-    scaleMap.insert(std::make_pair(0x39, 0x53)); // 9, シ
-    scaleMap.insert(std::make_pair(0x30, 0x54)); // 0, ド
 }
 
 } // namespace melody

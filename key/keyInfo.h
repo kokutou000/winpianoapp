@@ -22,7 +22,7 @@ namespace key
     public:
         void SetKeyPressState(const bool&, const unsigned short&);
         std::list<keyBase> GetKeyInfoPressed();
-
+        int GetScaleNo(const unsigned short&);
 
     private:
         void InitializeKeyInfoList();

@@ -28,7 +28,7 @@ namespace display
 
         void DrawWindow();
 
-        void SetKeyInfo(std::list<int>);
+        void Update();
 
         void SetKeyInfo(key::keyInfo*);
 

@@ -5,8 +5,6 @@
 #define _KEYCTRL
 
 #include <windows.h>
-#include <map>
-#include <list>
 
 #include "keyBase.h"
 #include "keyInfo.h"
@@ -28,15 +26,11 @@ namespace key
 
         void EventKeyDown(WPARAM wp);
         void EventKeyUp(WPARAM wp);
-
-        std::list<int> GetListKeyON();
         
     private:
         void UpdateKeyState(WPARAM wp, bool);
-        void InitializeKeyStateMap();
 
     private:
-        std::map<int, bool> keyState;  // キー状態<キー種別, T:押下/F:非押下>
 
         key::keyInfo* pKeyInfo;
     };

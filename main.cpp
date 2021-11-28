@@ -97,12 +97,8 @@ int WINAPI WinMain(
     {
         DispatchMessage(&msg);
 
-        // 押下キーリストを取得
-        std::list<int> pressKeyList = kCtrl.GetListKeyON();
-        // キー情報設定
-        mCtrl.SetKeyInfo(pressKeyList);
-        // 画面にキー情報を表示
-        dCtrl.SetKeyInfo(pressKeyList);
+        mCtrl.Update();
+        dCtrl.Update();
     }
 
     return msg.wParam;

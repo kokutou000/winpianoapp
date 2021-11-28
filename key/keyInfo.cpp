@@ -50,6 +50,16 @@ std::list<keyBase> keyInfo::GetKeyInfoPressed()
     return listRet;
 }
 
+//---------------------------------------------------------------
+// 押下キー情報リスト取得
+int keyInfo::GetScaleNo(const unsigned short& keyNo)
+{
+    for(auto key : keyInfoList)
+    {
+        if(key.keyNo == keyNo) return key.scaleNo;
+    }
+    return 0;
+}
 
 //---------------------------------------------------------------
 // キー情報リスト初期化
