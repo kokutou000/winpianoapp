@@ -21,8 +21,11 @@ namespace key
 
     public:
         void SetKeyPressState(const bool&, const unsigned short&);
+        void SetKeyRect(const RECT&, const int&);
+
         std::list<keyBase> GetKeyInfoPressed();
         int GetScaleNo(const unsigned short&);
+        RECT GetKeyRect(const int&);
 
     private:
         void InitializeKeyInfoList();

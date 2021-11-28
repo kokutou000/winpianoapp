@@ -32,6 +32,19 @@ void keyInfo::SetKeyPressState(const bool& isPress, const unsigned short& keyNo)
 }
 
 //---------------------------------------------------------------
+// 鍵盤描画位置情報設定
+void keyInfo::SetKeyRect(const RECT& recSet, const int& scaleNo)
+{
+    for(auto& key: keyInfoList)
+    {
+        if(key.scaleNo == scaleNo)
+        {
+            key.scaleDisp = recSet;
+        }
+    }
+}
+
+//---------------------------------------------------------------
 // 押下キー情報リスト取得
 std::list<keyBase> keyInfo::GetKeyInfoPressed()
 {
@@ -59,6 +72,22 @@ int keyInfo::GetScaleNo(const unsigned short& keyNo)
         if(key.keyValue == keyNo) return key.scaleValue;
     }
     return 0;
+}
+
+//---------------------------------------------------------------
+// 鍵盤描画位置情報取得
+RECT keyInfo::GetKeyRect(const int& scaleNo)
+{
+    for(auto& key: keyInfoList)
+    {
+        if(key.scaleNo == scaleNo)
+        {
+            return key.scaleDisp;
+        }
+    }
+
+    RECT temp;
+    return temp;
 }
 
 //---------------------------------------------------------------
@@ -118,6 +147,19 @@ void keyInfo::InitializeKeyInfoList()
     keyInfoList.push_back({0x79, "f10", false, 45, 0x5D, "A6",  {0, 0, 0, 0}});
     keyInfoList.push_back({0x7A, "f11", false, 46, 0x5E, "A6#", {0, 0, 0, 0}});
     keyInfoList.push_back({0x7B, "f12", false, 47, 0x5F, "B6",  {0, 0, 0, 0}});
+
+    keyInfoList.push_back({0, "NULL", false, 48, 0x60, "C7",  {0, 0, 0, 0}});
+    keyInfoList.push_back({0, "NULL", false, 49, 0x61, "C7#", {0, 0, 0, 0}});
+    keyInfoList.push_back({0, "NULL", false, 50, 0x62, "D7",  {0, 0, 0, 0}});
+    keyInfoList.push_back({0, "NULL", false, 51, 0x63, "D7#", {0, 0, 0, 0}});
+    keyInfoList.push_back({0, "NULL", false, 52, 0x64, "E7",  {0, 0, 0, 0}});
+    keyInfoList.push_back({0, "NULL", false, 53, 0x65, "F7",  {0, 0, 0, 0}});
+    keyInfoList.push_back({0, "NULL", false, 54, 0x66, "F7#", {0, 0, 0, 0}});
+    keyInfoList.push_back({0, "NULL", false, 55, 0x67, "G7",  {0, 0, 0, 0}});
+    keyInfoList.push_back({0, "NULL", false, 56, 0x68, "G7#", {0, 0, 0, 0}});
+    keyInfoList.push_back({0, "NULL", false, 57, 0x69, "A7",  {0, 0, 0, 0}});
+    keyInfoList.push_back({0, "NULL", false, 58, 0x6A, "A7#", {0, 0, 0, 0}});
+    keyInfoList.push_back({0, "NULL", false, 59, 0x6B, "B7",  {0, 0, 0, 0}});
 }
 
 } // namespace key

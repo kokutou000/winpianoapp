@@ -21,7 +21,6 @@ displayCtrl::displayCtrl()
     pianoKeyOnList_.clear();
 
     InitializeKeyMap();
-    InitializeRectMap();
 }
 
 //---------------------------------------------------------------
@@ -86,8 +85,8 @@ void displayCtrl::UpdateWindowInfo()
         int ybb = hWin_ * 6.0 / 10.0;
         RECT rBlack = {xbl, ybt, xbr, ybb};
 
-        keyRectMap_[2*i]   = rWhite;
-        keyRectMap_[2*i+1] = rBlack;
+        pKeyInfo_->SetKeyRect(rWhite, 2*i);
+        pKeyInfo_->SetKeyRect(rBlack, 2*i+1);
     }
 
     DrawWindow();
@@ -115,7 +114,7 @@ void displayCtrl::DrawWindow()
     for(int i = 0; i < PIANOKEYBOARDNUMALL; i = i+2)
     {
         // 白鍵
-        RECT rw = keyRectMap_[i];
+        RECT rw = pKeyInfo_->GetKeyRect(i);
         Rectangle(hdc, rw.left, rw.top, rw.right, rw.bottom);
     }
 
@@ -124,7 +123,7 @@ void displayCtrl::DrawWindow()
     for(auto key : pianoKeyOnList_)
     {
         if(key == 0) continue;
-        RECT keyRect = keyRectMap_[key];
+        RECT keyRect = pKeyInfo_->GetKeyRect(key);
         Rectangle(hdc, keyRect.left, keyRect.top, keyRect.right, keyRect.bottom);
     }
 
@@ -148,7 +147,7 @@ void displayCtrl::DrawWindow()
         if(isPressed) continue;
 
         // 黒鍵
-        RECT rb = keyRectMap_[i];
+        RECT rb = pKeyInfo_->GetKeyRect(i);
         Rectangle(hdc, rb.left, rb.top, rb.right, rb.bottom);
     }
     
@@ -198,18 +197,6 @@ void displayCtrl::Update()
         pianoKeyOnList_ = tmp;
         // 無効リージョンを生成することでWM_PAINTメッセージのポストを呼び出す
         InvalidateRect(windowInfo_, nullptr, true);
-    }
-}
-
-//---------------------------------------------------------------
-// 鍵盤位置情報マップ初期化
-void displayCtrl::InitializeRectMap()
-{
-    keyRectMap_.clear();
-    for(int i = 0; i < PIANOKEYBOARDNUMALL; ++i)
-    {
-        RECT tmp = {0,0,0,0};
-        keyRectMap_.insert(std::make_pair(i, tmp));
     }
 }
 
