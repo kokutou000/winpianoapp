@@ -51,7 +51,7 @@ void melodyCtrl::Update()
         if(isKeyPressContinue) continue;
 
         // 押下キーに対応する音階値取得
-        int scaleVal = pKeyInfo->GetScaleNo(ch.second);
+        int scaleVal = pKeyInfo->GetScaleValue(ch.second);
         
         // 音消去
         midiOutShortMsg(hmidiOut, MakeMIDIMsg(0x8, ch.first, scaleVal, 0));
@@ -82,7 +82,7 @@ void melodyCtrl::Update()
                 // チャンネル設定
                 ch.second = key.keyValue;
                 // キーに対応する音階値取得
-                int scaleVal = pKeyInfo->GetScaleNo(key.keyValue);
+                int scaleVal = pKeyInfo->GetScaleValue(key.keyValue);
                 // 音生成
                 midiOutShortMsg(hmidiOut, MakeMIDIMsg(0x9, ch.first, scaleVal, velocity));
                 break;

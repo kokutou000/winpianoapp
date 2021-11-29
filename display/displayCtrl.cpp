@@ -18,9 +18,7 @@ displayCtrl::displayCtrl()
     wWin_ = 0;
     hWin_ = 0;
     flagUpdate_ = true;
-    pianoKeyOnList_.clear();
-
-    InitializeKeyMap();
+    keyOnList_.clear();
 }
 
 //---------------------------------------------------------------
@@ -120,10 +118,10 @@ void displayCtrl::DrawWindow()
 
     // 押下鍵盤
     SelectObject(hdc, hbrushY);
-    for(auto key : pianoKeyOnList_)
+    for(auto key : keyOnList_)
     {
         if(key == 0) continue;
-        RECT keyRect = pKeyInfo_->GetKeyRect(key);
+        RECT keyRect = pKeyInfo_->GetKeyRect(pKeyInfo_->GetScaleNo(key));
         Rectangle(hdc, keyRect.left, keyRect.top, keyRect.right, keyRect.bottom);
     }
 
@@ -136,9 +134,9 @@ void displayCtrl::DrawWindow()
         if((i-1)/2 % (PIANOOCTAVENO-1) == 6) continue;
         // 押下鍵盤に含まれているものはスキップ
         bool isPressed = false;
-        for(auto keyOn : pianoKeyOnList_)
+        for(auto keyOn : keyOnList_)
         {
-            if(keyOn == i)
+            if(pKeyInfo_->GetScaleNo(keyOn) == i)
             {
                 isPressed = true;
                 break;
@@ -164,16 +162,15 @@ void displayCtrl::Update()
 {
     auto keyInfoList = pKeyInfo_->GetKeyInfoPressed();
 
-    std::vector<int> tmp;
+    std::vector<int> tmp;   // キーボード押下キー値リスト
     for(auto keyinfo : keyInfoList)
     {
         if(!keyinfo.isPressed) continue;
-        int keypiano = keyKeyMap_[keyinfo.keyValue];
-        if(keypiano == 0) continue;
-        tmp.push_back(keypiano);
+        if(keyinfo.keyValue == 0) continue;
+        tmp.push_back(keyinfo.keyValue);
     }
 
-    if(tmp.size() != pianoKeyOnList_.size())
+    if(tmp.size() != keyOnList_.size())
     {
         flagUpdate_ = true;
     }
@@ -183,7 +180,7 @@ void displayCtrl::Update()
         int tsize = tmp.size();
         for(int i = 0; i < tsize; ++i)
         {
-            if(tmp[i] != pianoKeyOnList_[i])
+            if(tmp[i] != keyOnList_[i])
             {
                 check = true;
                 break;
@@ -194,54 +191,10 @@ void displayCtrl::Update()
 
     if(flagUpdate_ == true)
     {
-        pianoKeyOnList_ = tmp;
+        keyOnList_ = tmp;
         // 無効リージョンを生成することでWM_PAINTメッセージのポストを呼び出す
         InvalidateRect(windowInfo_, nullptr, true);
     }
-}
-
-//---------------------------------------------------------------
-// キーvs鍵盤マップ初期化
-void displayCtrl::InitializeKeyMap()
-{
-    keyKeyMap_.clear();
-    keyKeyMap_.insert(std::make_pair(0x5A, 1)); // z, 
-    keyKeyMap_.insert(std::make_pair(0x58, 2)); // x, 
-    keyKeyMap_.insert(std::make_pair(0x43, 3)); // c, 
-    keyKeyMap_.insert(std::make_pair(0x56, 4)); // v, 
-    keyKeyMap_.insert(std::make_pair(0x42, 6)); // b, 
-    keyKeyMap_.insert(std::make_pair(0x4E, 7)); // n, 
-    keyKeyMap_.insert(std::make_pair(0x4D, 8)); // m, 
-    keyKeyMap_.insert(std::make_pair(0x41, 9)); // a, 
-    keyKeyMap_.insert(std::make_pair(0x53, 10)); // s, 
-    keyKeyMap_.insert(std::make_pair(0x44, 11)); // d, 
-    keyKeyMap_.insert(std::make_pair(0x46, 12)); // f, 
-    keyKeyMap_.insert(std::make_pair(0x47, 14)); // g, 
-    keyKeyMap_.insert(std::make_pair(0x48, 15)); // h, 
-    keyKeyMap_.insert(std::make_pair(0x4A, 16)); // j, 
-    keyKeyMap_.insert(std::make_pair(0x4B, 17)); // k, 
-    keyKeyMap_.insert(std::make_pair(0x4C, 18)); // l, 
-    keyKeyMap_.insert(std::make_pair(0x51, 20)); // q, 
-    keyKeyMap_.insert(std::make_pair(0x57, 21)); // w, 
-    keyKeyMap_.insert(std::make_pair(0x45, 22)); // e, 
-    keyKeyMap_.insert(std::make_pair(0x52, 23)); // r, 
-    keyKeyMap_.insert(std::make_pair(0x54, 24)); // t, 
-    keyKeyMap_.insert(std::make_pair(0x59, 25)); // y, 
-    keyKeyMap_.insert(std::make_pair(0x55, 26)); // u, 
-    keyKeyMap_.insert(std::make_pair(0x49, 28)); // i, 
-    keyKeyMap_.insert(std::make_pair(0x4F, 29)); // o, 
-    keyKeyMap_.insert(std::make_pair(0x50, 30)); // p, 
-
-    keyKeyMap_.insert(std::make_pair(0x31, 31)); // 1, 
-    keyKeyMap_.insert(std::make_pair(0x32, 32)); // 2, 
-    keyKeyMap_.insert(std::make_pair(0x33, 34)); // 3, 
-    keyKeyMap_.insert(std::make_pair(0x34, 35)); // 4, 
-    keyKeyMap_.insert(std::make_pair(0x35, 36)); // 5, 
-    keyKeyMap_.insert(std::make_pair(0x36, 37)); // 6, 
-    keyKeyMap_.insert(std::make_pair(0x37, 38)); // 7, 
-    keyKeyMap_.insert(std::make_pair(0x38, 39)); // 8, 
-    keyKeyMap_.insert(std::make_pair(0x39, 40)); // 9, 
-    keyKeyMap_.insert(std::make_pair(0x30, 42)); // 0, 
 }
 
 } // namespace display

@@ -25,6 +25,7 @@ namespace key
 
         std::list<keyBase> GetKeyInfoPressed();
         int GetScaleNo(const unsigned short&);
+        int GetScaleValue(const unsigned short&);
         RECT GetKeyRect(const int&);
 
     private:

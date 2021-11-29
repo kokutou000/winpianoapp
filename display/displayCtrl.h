@@ -33,17 +33,13 @@ namespace display
         void SetKeyInfo(key::keyInfo*);
 
     private:
-        void InitializeKeyMap();
-
-    private:
         HWND windowInfo_;
 
         int wWin_;
         int hWin_;
         bool flagUpdate_;
 
-        std::vector<int> pianoKeyOnList_;   // 押下鍵盤リスト
-        std::map<int, int> keyKeyMap_;   // キーボードvs鍵盤マップ<キー, 鍵盤番号>
+        std::vector<int> keyOnList_;   // 押下キーボードリスト
 
         key::keyInfo* pKeyInfo_;
     };
