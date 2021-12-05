@@ -109,6 +109,23 @@ RECT keyInfo::GetKeyRect(const int& scaleNo)
 }
 
 //---------------------------------------------------------------
+// 鍵盤対応キーボード情報取得
+// [in] scaleNo: 鍵盤番号
+std::string keyInfo::GetKeyChar(const int& scaleNo)
+{
+    for(auto key: keyInfoList)
+    {
+        if(key.scaleNo == scaleNo)
+        {
+            return (key.keyChar);
+        }
+    }
+
+    std::string temp = "";
+    return temp;
+}
+
+//---------------------------------------------------------------
 // キー情報リスト初期化
 void keyInfo::InitializeKeyInfoList()
 {

@@ -27,6 +27,7 @@ namespace key
         int GetScaleNo(const unsigned short&);
         int GetScaleValue(const unsigned short&);
         RECT GetKeyRect(const int&);
+        std::string GetKeyChar(const int&);
 
     private:
         void InitializeKeyInfoList();

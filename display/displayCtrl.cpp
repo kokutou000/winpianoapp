@@ -108,12 +108,17 @@ void displayCtrl::DrawWindow()
 
     SelectObject(hdc, hpen);
 
+    // キー文字色設定
+    SetTextColor(hdc, RGB(0,0,255));
     // ベース鍵盤
     for(int i = 0; i < PIANOKEYBOARDNUMALL; i = i+2)
     {
         // 白鍵
         RECT rw = pKeyInfo_->GetKeyRect(i);
         Rectangle(hdc, rw.left, rw.top, rw.right, rw.bottom);
+        // 白鍵対応キー
+        std::string keybd = pKeyInfo_->GetKeyChar(i);
+        TextOut(hdc, rw.left + (rw.right - rw.left) * 0.4, (rw.bottom - rw.top) * 0.62, keybd.c_str(), keybd.length());
     }
 
     // 押下鍵盤
@@ -125,6 +130,9 @@ void displayCtrl::DrawWindow()
         Rectangle(hdc, keyRect.left, keyRect.top, keyRect.right, keyRect.bottom);
     }
 
+    // キー文字色設定
+    SetTextColor(hdc, RGB(224,224,224));
+    SetBkColor(hdc, RGB(0,0,0));
     // 黒鍵盤
     SelectObject(hdc, hbrushB);
     for(int i = 1; i < PIANOKEYBOARDNUMALL; i = i+2)
@@ -147,6 +155,10 @@ void displayCtrl::DrawWindow()
         // 黒鍵
         RECT rb = pKeyInfo_->GetKeyRect(i);
         Rectangle(hdc, rb.left, rb.top, rb.right, rb.bottom);
+
+        // 黒鍵対応キー
+        std::string keybd = pKeyInfo_->GetKeyChar(i);
+        TextOut(hdc, rb.left + (rb.right - rb.left) * 0.4, (rb.bottom - rb.top) * 0.95, keybd.c_str(), keybd.length());
     }
     
     EndPaint(windowInfo_, &ps);

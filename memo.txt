@@ -10,6 +10,8 @@ g++ .\main.cpp .\key\keyCtrl.cpp .\melody\melodyCtrl.cpp .\display\displayCtrl.c
 
 g++ .\main.cpp .\key\keyInfo.cpp .\key\keyCtrl.cpp .\melody\melodyCtrl.cpp .\display\displayCtrl.cpp -W -lgdi32 C:\Windows\System32\winmm.dll
 
+g++ .\main.cpp .\key\keyInfo.cpp .\key\keyCtrl.cpp .\melody\melodyCtrl.cpp .\display\displayCtrl.cpp -W -lgdi32 C:\Windows\System32\winmm.dll -o keypiano.exe
+
 参考
 http://wisdom.sakura.ne.jp/system/winapi/win32/index.html
 http://www13.plala.or.jp/kymats/study/MULTIMEDIA/midiOutShortMsg.html
